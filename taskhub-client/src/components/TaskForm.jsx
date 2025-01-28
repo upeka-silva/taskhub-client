@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogActions,
@@ -9,20 +9,36 @@ import {
   Box,
 } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
-import dayjs from "dayjs"; // To handle date formatting
+import dayjs from "dayjs";
+import toast from "react-hot-toast";
+import axios from "axios"; // Make sure axios is imported
+import api from "../api/api";
 
 const TaskForm = ({ open, onClose, onSubmitTask }) => {
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
   const {
     handleSubmit,
     control,
     formState: { errors },
+    reset, // Add reset to clear the form after successful submission
   } = useForm();
 
-  // Handle task form submission
-  const onSubmit = (data) => {
-    console.log("Form Data Submitted:", data);
-    onSubmitTask(data);
-    onClose(); // Close the modal after submission
+  const onSubmit = async (data) => {
+    setIsLoading(true);
+    try {
+      const response = await api.post("/api/v1/tasks/add", data);
+      console.log("Task added successfully:", response.data);
+      onSubmitTask(response.data);
+      toast.success("Task successfully created!");
+      reset();
+      onClose();
+    } catch (error) {
+      console.error("Error adding task:", error);
+      toast.error("Error adding task! Please try again.");
+      t;
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -31,7 +47,6 @@ const TaskForm = ({ open, onClose, onSubmitTask }) => {
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {/* Task Name */}
             <Controller
               name="taskName"
               control={control}
@@ -49,7 +64,6 @@ const TaskForm = ({ open, onClose, onSubmitTask }) => {
               )}
             />
 
-            {/* Description */}
             <Controller
               name="description"
               control={control}
@@ -71,7 +85,6 @@ const TaskForm = ({ open, onClose, onSubmitTask }) => {
               )}
             />
 
-            {/* Due Date */}
             <Controller
               name="dueDate"
               control={control}
@@ -95,8 +108,12 @@ const TaskForm = ({ open, onClose, onSubmitTask }) => {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSubmit(onSubmit)} variant="contained">
-          Submit
+        <Button
+          onClick={handleSubmit(onSubmit)}
+          variant="contained"
+          disabled={isLoading}
+        >
+          {isLoading ? "Submitting..." : "Submit"}{" "}
         </Button>
       </DialogActions>
     </Dialog>
