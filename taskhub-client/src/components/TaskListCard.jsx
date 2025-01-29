@@ -8,6 +8,7 @@ import {
   Box,
 } from "@mui/material";
 import { FaRegCheckCircle, FaRegClock } from "react-icons/fa";
+import dayjs from "dayjs";
 
 const TaskCard = ({ task }) => {
   return (
@@ -27,7 +28,7 @@ const TaskCard = ({ task }) => {
           }}
         >
           <Typography variant="caption">
-            <FaRegClock /> {task.dueDate}
+            <FaRegClock /> {dayjs(task.dueDate).format("YYYY-MM-DD HH:mm")}
           </Typography>
           <Typography
             variant="caption"
