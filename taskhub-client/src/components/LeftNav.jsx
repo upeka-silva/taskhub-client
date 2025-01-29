@@ -31,7 +31,7 @@ const LeftNav = ({
         </ListItem>
         <Divider />
 
-        <ListItem button onClick={() => navigate("/dashboard/user")}>
+        <ListItem button onClick={() => navigate("/user-details")}>
           <FaUserAlt style={{ marginRight: "10px" }} />
           <ListItemText primary="User Details" />
         </ListItem>
@@ -41,7 +41,7 @@ const LeftNav = ({
           <ListItemText primary="Today's Tasks" />
         </ListItem>
 
-        <ListItem button onClick={() => navigate("")}>
+        <ListItem button onClick={() => window.location.reload()}>
           <FaTasks style={{ marginRight: "10px" }} />
           <ListItemText primary="All Tasks" />
         </ListItem>

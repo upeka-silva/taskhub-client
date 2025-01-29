@@ -1,19 +1,28 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useStoreContext } from "../api/contextApi";
 import navBarLogo from "../assets/task-actions.png";
-
 import "../style/NavBar.css";
 
-const Navbar = ({ path, token, onLogOutHandler }) => {
+const Navbar = () => {
   const [navbarOpen, setNavbarOpen] = useState(false);
+  const { token, setToken } = useStoreContext();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("USER_EMAIL");
+    localStorage.removeItem("JWT_TOKEN");
+    setToken(null);
+    navigate("/");
+  };
 
   return (
     <div className="navbar">
       <div className="navbar-inner">
-        <Link to="/" className="navbar-logo">
+        <Link to="/dashboard" className="navbar-logo">
           Task-Hub
           <div className="navbar-logo-img">
-            <img src={navBarLogo} />
+            <img src={navBarLogo} alt="Task-Hub Logo" />
           </div>
         </Link>
 
@@ -26,9 +35,11 @@ const Navbar = ({ path, token, onLogOutHandler }) => {
             </li>
           )}
           {token && (
-            <button onClick={onLogOutHandler} className="navbar-button">
-              LogOut
-            </button>
+            <li>
+              <button onClick={handleLogout} className="navbar-button">
+                LogOut
+              </button>
+            </li>
           )}
         </ul>
 

@@ -11,31 +11,40 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
-import axios from "axios"; // Make sure axios is imported
 import api from "../api/api";
+import { useStoreContext } from "../api/contextApi";
+import { ContextApi } from "../api/contextApi";
 
 const TaskForm = ({ open, onClose, onSubmitTask }) => {
-  const [isLoading, setIsLoading] = useState(false); // Add loading state
+  const [isLoading, setIsLoading] = useState(false);
+  const { token } = useStoreContext(ContextApi);
+
   const {
     handleSubmit,
     control,
     formState: { errors },
-    reset, // Add reset to clear the form after successful submission
+    reset,
   } = useForm();
 
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      const response = await api.post("/api/v1/tasks/add", data);
-      console.log("Task added successfully:", response.data);
+      const response = await api.post("/api/v1/tasks/add", data, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       onSubmitTask(response.data);
       toast.success("Task successfully created!");
       reset();
       onClose();
+      return;
     } catch (error) {
       console.error("Error adding task:", error);
       toast.error("Error adding task! Please try again.");
-      t;
     } finally {
       setIsLoading(false);
     }
@@ -104,18 +113,14 @@ const TaskForm = ({ open, onClose, onSubmitTask }) => {
               )}
             />
           </Box>
+          <DialogActions>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button type="submit" variant="contained" disabled={isLoading}>
+              {isLoading ? "Submitting..." : "Submit"}
+            </Button>
+          </DialogActions>
         </form>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button
-          onClick={handleSubmit(onSubmit)}
-          variant="contained"
-          disabled={isLoading}
-        >
-          {isLoading ? "Submitting..." : "Submit"}{" "}
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };
